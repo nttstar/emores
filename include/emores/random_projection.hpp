@@ -1,17 +1,15 @@
-#ifndef EMORES_RANDOMPROJECTION_HPP_ 
+#ifndef EMORES_RANDOMPROJECTION_HPP_
 #define EMORES_RANDOMPROJECTION_HPP_
 
 #include <string>
 #include <vector>
-#include <am/succinct/fujimap/fujimap.hpp>
-#include <util/DynamicBloomFilter.h>
+//#include <am/succinct/fujimap/fujimap.hpp>
+//#include <util/DynamicBloomFilter.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cstdlib>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 
 namespace emores {
 class RandomProjection {
@@ -20,7 +18,7 @@ public:
     typedef std::pair<uint16_t, int8_t> Item;
     typedef std::vector<Item> Row;
     typedef std::vector<Row> Matrix;
-    RandomProjection(uint32_t row, uint32_t col, uint32_t t, uint32_t seed) 
+    RandomProjection(uint32_t row, uint32_t col, uint32_t t, uint32_t seed)
     : row_(row), col_(col), t_(t), seed_(seed)
     {
         m_.resize(row_);
@@ -38,7 +36,7 @@ public:
             }
         }
     }
-    uint32_t operator()(std::vector<float>& sift_desc) const {
+    uint32_t Get(std::vector<float>& sift_desc) const {
         float sum = 0.0;
         for(uint32_t i=0;i<sift_desc.size();i++) {
             sum += sift_desc[i]*sift_desc[i];
@@ -51,12 +49,12 @@ public:
         uint32_t fp=0;
         for(uint32_t f=0;f<row_;f++)
         {
-            Row& row = m_[f];
+            const Row& row = m_[f];
             float v = 0.0;
             for(uint32_t ri=0;ri<row.size();ri++)
             {
-                Item& item = row[ri];
-                v+=fvec[item.first]*item.second;
+                const Item& item = row[ri];
+                v+=sift_desc[item.first]*item.second;
             }
             if(v>0.0)
             {
@@ -67,9 +65,15 @@ public:
         return fp;
     }
 
+private:
+    Matrix m_;
+    uint32_t row_;
+    uint32_t col_;
+    uint32_t t_;
+    uint32_t seed_;
+
 };
 
 }
 
 #endif
-

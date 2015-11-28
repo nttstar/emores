@@ -1,10 +1,9 @@
-#ifndef EMORES_SIFT_HPP_ 
+#ifndef EMORES_SIFT_HPP_
 #define EMORES_SIFT_HPP_
 
 #include <string>
 #include <vector>
-#include <am/succinct/fujimap/fujimap.hpp>
-#include <util/DynamicBloomFilter.h>
+#include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/features2d.hpp>
@@ -31,33 +30,21 @@ public:
         std::vector<float> desc;
     };
 
-    struct CompactPoint {
-        uint8_t block;
-        uint32_t sift_value;
-    };
-
-
 public:
 
-    Sift():sift_(NULL) {
+    Sift(uint32_t pcount, uint32_t img_x, uint32_t img_y):sift_(pcount), img_x_(img_x), img_y_(img_y) {
     }
     ~Sift() {
-        if(sift_!=NULL) delete sift_;
     }
 
-    Param& GetParam() { return param_; }
-
     void GetSift(const std::string& img_file, std::vector<Point>& points) const {
-        if(sift_==NULL) {
-            sift_ = new cv::SIFT(param_.pcount);
-        }
         std::vector<cv::KeyPoint> keypoints;
         cv::Mat des;
         cv::Mat image;
         try {
             image = cv::imread(img_file, CV_LOAD_IMAGE_GRAYSCALE);
             if(image.cols==0 || image.rows==0) return;
-            cv::Size img_size(param_.img_xsize, param_.img_ysize);
+            cv::Size img_size(img_x_, img_y_);
             double wratio = (double)img_size.width/image.cols;
             double hratio = (double)img_size.height/image.rows;
             //LOG(INFO)<<image.cols<<","<<image.rows<<","<<img_size.width<<","<<img_size.height<<std::endl;
@@ -69,7 +56,7 @@ public:
                 image = rimage;
             }
             cv::Mat mask; //TODO
-            (*sift_)(image,mask, keypoints, des);
+            sift_(image,mask, keypoints, des);
         }
         catch(std::exception& ex) {
             std::cerr<<ex.what()<<std::endl;
@@ -100,14 +87,10 @@ public:
 
 
 private:
-    Param param_;
-    cv::SIFT* sift_;
+    cv::SIFT sift_;
+    uint32_t img_x_;
+    uint32_t img_y_;
 
 };
-
 }
-
 #endif
-
-
-
