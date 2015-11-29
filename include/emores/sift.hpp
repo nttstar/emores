@@ -8,21 +8,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "consts.hpp"
 
 namespace emores {
 class Sift {
 public:
-    struct Param {
-        uint32_t pcount;//points count
-        uint32_t img_xsize;
-        uint32_t img_ysize;
-        float xcut;//proportion
-        float ycut;
-        Param()
-        : pcount(200), img_xsize(300), img_ysize(300), xcut(0.25), ycut(0.25)
-        {
-        }
-    };
 
     struct Point {
         float x;//proportion

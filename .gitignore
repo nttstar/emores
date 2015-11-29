@@ -1,3 +1,5 @@
 
 include/emores/image_matcher.h
 bin/
+
+*.swp

@@ -12,6 +12,7 @@
 #include <cstdlib>
 
 namespace emores {
+template <typename T>
 class RandomProjection {
 
 public:
@@ -21,6 +22,8 @@ public:
     RandomProjection(uint32_t row, uint32_t col, uint32_t t, uint32_t seed)
     : row_(row), col_(col), t_(t), seed_(seed)
     {
+        //std::cerr<<sizeof(T)<<","<<row<<std::endl;
+        assert(sizeof(T)*8>=row);
         m_.resize(row_);
         srand(seed);
         for(uint32_t i=0;i<row_;i++) {
@@ -36,7 +39,7 @@ public:
             }
         }
     }
-    uint32_t Get(std::vector<float>& sift_desc) const {
+    T Get(std::vector<float>& sift_desc) const {
         float sum = 0.0;
         for(uint32_t i=0;i<sift_desc.size();i++) {
             sum += sift_desc[i]*sift_desc[i];
@@ -46,7 +49,7 @@ public:
         {
             sift_desc[i] /= sum;
         }
-        uint32_t fp=0;
+        T fp=0;
         for(uint32_t f=0;f<row_;f++)
         {
             const Row& row = m_[f];
@@ -58,7 +61,7 @@ public:
             }
             if(v>0.0)
             {
-                uint32_t vv = (1<<f);
+                T vv = (1<<f);
                 fp |= vv;
             }
         }
