@@ -63,14 +63,33 @@ public:
             pt.x = (float)kp.pt.x/image.cols;
             pt.y = (float)kp.pt.y/image.rows;
             pt.desc.resize(des.cols, 0.0);
-            std::vector<float> fvec(des.cols, 0.0);
             for(int j=0;j<des.cols;j++)
             {
                 float f = des.at<float>(i, j);
                 assert(f<=255.0);
                 pt.desc[j] = f;
             }
+            Normalize_(pt.desc);
             points.push_back(pt);
+        }
+    }
+
+private:
+    void Normalize_(std::vector<float>& fvec) const {
+        float sum = 0.0;
+        for(uint32_t i=0;i<fvec.size();i++) {
+            sum += fvec[i]*fvec[i];
+        }
+        sum = std::sqrt(sum);
+        float sum2 = 0.0;
+        for(uint32_t i=0;i<fvec.size();i++) {
+            fvec[i] /= sum;
+            if(fvec[i]>0.2) fvec[i] = 0.2;
+            sum2 += fvec[i]*fvec[i];
+        }
+        sum2 = std::sqrt(sum2);
+        for(uint32_t i=0;i<fvec.size();i++) {
+            fvec[i] /= sum2;
         }
     }
 
